@@ -12,24 +12,25 @@ authRouter.post("/api/signup", async (req: Request, res: Response) => {
   try {
     const { name, email, profilePic } = req.body;
 
-    const user = await User.findOne({ email })
+    let user = await User.findOne({ email });
 
-    if (user) {
-      return res.status(400).json({ message: "User already exists" })
+    if (!user) {
+
+      const newUser = new User({
+        name,
+        email,
+        profilePic
+      })
+
+      user = await newUser.save()
     }
 
-    const newUser = await User.create({
-      name,
-      email,
-      profilePic
-    })
-
     const token = sign({}, authConfig.jwt.secret, {
-      subject: newUser.id,
+      subject: user.id,
       expiresIn: authConfig.jwt.expiresIn,
     });
 
-    return res.status(201).json({ user: newUser, token });
+    return res.status(201).json({ user: user, token });
   } catch (err) {
     return res.status(500).send(err);
   }
