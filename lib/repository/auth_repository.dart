@@ -91,10 +91,9 @@ class AuthRepository {
           Uri.parse('$host/'),
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
-            'Bearer': token,
+            'Authorization': 'Bearer: $token',
           },
         );
-
         switch (res.statusCode) {
           case 200:
             final newUser = UserModel.fromJson(
