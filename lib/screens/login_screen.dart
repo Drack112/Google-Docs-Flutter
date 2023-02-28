@@ -28,21 +28,23 @@ class LoginScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      body: ElevatedButton.icon(
-        onPressed: () => signInWithGoogle(ref, context),
-        label: const Text(
-          "Sign In with Google",
-          style: TextStyle(
-            color: KBlackColor,
+      body: Center(
+        child: ElevatedButton.icon(
+          onPressed: () => signInWithGoogle(ref, context),
+          icon: Image.asset(
+            'assets/images/g-logo-2.png',
+            height: 20,
           ),
-        ),
-        icon: Image.asset(
-          "assets/images/g-logo-2.png",
-          height: 20,
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: KWhiteColor,
-          minimumSize: const Size(150, 50),
+          label: const Text(
+            'Sign in with Google',
+            style: TextStyle(
+              color: KBlackColor,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: KWhiteColor,
+            minimumSize: const Size(150, 50),
+          ),
         ),
       ),
     );
