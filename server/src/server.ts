@@ -4,6 +4,8 @@ import cors from "cors";
 import "express-async-errors";
 import "dotenv/config";
 
+import "./database/connection"
+
 const app = express();
 
 app.use(cors());
