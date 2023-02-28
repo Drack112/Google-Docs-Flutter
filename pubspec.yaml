@@ -39,6 +39,7 @@ dependencies:
   flutter_riverpod: ^2.2.0
   http: ^0.13.5
   google_sign_in_web: ^0.11.0
+  shared_preferences: ^2.0.18
 
 dev_dependencies:
   flutter_test:
