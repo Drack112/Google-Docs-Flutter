@@ -4,6 +4,7 @@ import { sign } from "jsonwebtoken";
 
 import authConfig from "../config/auth";
 import isAuthenticated from "../middlewares/isAuthenticated";
+import AppError from "../errors/AppError";
 
 const authRouter = Router();
 
@@ -30,14 +31,18 @@ authRouter.post("/api/signup", async (req: Request, res: Response) => {
       expiresIn: authConfig.jwt.expiresIn,
     });
 
-    return res.status(201).json({ user: user, token });
+    res.status(201).json({ user: user, token });
   } catch (err) {
-    return res.status(500).send(err);
+    throw new AppError(err.message, 500)
   }
 })
 
 authRouter.get("/", isAuthenticated, async (req: Request, res: Response) => {
   const user = await User.findById(req.user)
+
+  if (!user) {
+    throw new AppError("User does not exist", 400);
+  }
 
   const authHeader = req.headers.authorization;
   const [, token] = authHeader.split(" ");
