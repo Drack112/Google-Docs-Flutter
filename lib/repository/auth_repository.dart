@@ -40,8 +40,8 @@ class AuthRepository {
       if (user != null) {
         final userAcc = UserModel(
           email: user.email,
-          name: user.displayName!,
-          profilePic: user.photoUrl!,
+          name: user.displayName ?? '',
+          profilePic: user.photoUrl ?? '',
           uid: '',
           token: '',
         );
