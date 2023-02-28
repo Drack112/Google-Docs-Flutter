@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  app:
+    container_name: server-websocket-app-development
+    build:
+      context: .
+    volumes:
+      - .:/home/node/app
+      - ./node_modules:/home/node/app/node_modules
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    entrypoint: dockerize -wait tcp://db:27017 -timeout 40s .docker/entrypoint.sh
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: mongo:latest
+    container_name: mongo-dev-server
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    env_file:
+      - .env
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-db:/data/db
+
+volumes:
+  mongo-db:
