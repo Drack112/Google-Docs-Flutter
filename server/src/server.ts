@@ -6,10 +6,14 @@ import "dotenv/config";
 
 import "./database/connection"
 
+import authRouter from "./routes/AuthRoutes";
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.use(authRouter);
 
 const PORT = process.env.APP_PORT;
 
