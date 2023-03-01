@@ -110,4 +110,27 @@ class DocumentRepository {
     }
     return error;
   }
+
+  void updateTitle({
+    required String token,
+    required String id,
+    required String title,
+  }) async {
+    ErrorModel error = ErrorModel(
+      error: 'Some unexpected error occurred.',
+      data: null,
+    );
+
+    await _client.post(
+      Uri.parse('$host/doc/title'),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer: $token',
+      },
+      body: jsonEncode({
+        'title': title,
+        'id': id,
+      }),
+    );
+  }
 }
