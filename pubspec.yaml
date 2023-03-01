@@ -41,6 +41,7 @@ dependencies:
   google_sign_in_web: ^0.11.0
   shared_preferences: ^2.0.18
   routemaster: ^1.0.1
+  flutter_quill: ^6.4.4
 
 dev_dependencies:
   flutter_test:
