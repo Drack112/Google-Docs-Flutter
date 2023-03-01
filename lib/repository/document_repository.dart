@@ -6,7 +6,7 @@ import 'package:docs_google/models/error_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 
-final documentRepository = Provider(
+final documentRepositoryProvider = Provider(
   (ref) => DocumentRepository(
     client: Client(),
   ),
@@ -53,6 +53,51 @@ class DocumentRepository {
         default:
           error = ErrorModel(
             error: null,
+            data: null,
+          );
+          break;
+      }
+    } catch (e) {
+      error = ErrorModel(
+        error: e.toString(),
+        data: null,
+      );
+    }
+    return error;
+  }
+
+  Future<ErrorModel> getDocuments(String token) async {
+    ErrorModel error = ErrorModel(
+      error: 'Some unexpected error occurred.',
+      data: null,
+    );
+    try {
+      var res = await _client.get(
+        Uri.parse('$host/docs/me'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer: $token',
+        },
+      );
+      switch (res.statusCode) {
+        case 200:
+          List<DocumentModel> documents = [];
+
+          for (int i = 0; i < jsonDecode(res.body).length; i++) {
+            documents.add(
+              DocumentModel.fromJson(
+                jsonEncode(jsonDecode(res.body)[i]),
+              ),
+            );
+          }
+          error = ErrorModel(
+            error: null,
+            data: documents,
+          );
+          break;
+        default:
+          error = ErrorModel(
+            error: res.body,
             data: null,
           );
           break;
