@@ -47,4 +47,17 @@ documentRouter.get("/doc/:id", isAuthenticated, async (req: Request, res: Respon
   }
 })
 
+documentRouter.post("/doc/title", isAuthenticated, async (req: Request, res: Response) => {
+  try {
+    const { id, title } = req.body;
+    const document = await Document.findByIdAndUpdate(id, {
+      title
+    })
+
+    res.status(200).json(document);
+  } catch (err) {
+    throw new AppError(err.message, 500);
+  }
+})
+
 export default documentRouter;
