@@ -32,6 +32,10 @@ Aplicação multiplataforma desenvolvido em Flutter (ios, android e web) com o f
 
 
 
+https://user-images.githubusercontent.com/61944386/222469140-69da68f8-a51a-4d3d-93f4-d83d8bf6ca33.mp4
+
+
+
 <a id="run"></a>
 
 #### 💽 1. Pré-requisitos:
