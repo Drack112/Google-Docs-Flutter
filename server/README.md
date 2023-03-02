@@ -57,8 +57,8 @@ Preencha o arquivo `.env.example` com as informações cobradas e depois renomei
 
 APP_SECRET=um_token_qualquer
 
-# 3000 é a porta do projeto flutter
-APP_PORT=3000
+# 3001 é a porta da API, ela precisa ser 3001
+APP_PORT=3001
 
 # Mongo
 MONGO_DB=
