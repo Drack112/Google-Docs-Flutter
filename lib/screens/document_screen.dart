@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:docs_google/colors.dart';
 import 'package:docs_google/common/widgets/loader.dart';
 import 'package:docs_google/models/document_model.dart';
@@ -24,8 +26,8 @@ class DocumentScreen extends ConsumerStatefulWidget {
 
 class _DocumentScreenState extends ConsumerState<DocumentScreen> {
   TextEditingController titleController =
-      TextEditingController(text: "Untitled Document");
-  final quill.QuillController _controller = quill.QuillController.basic();
+      TextEditingController(text: 'Untitled Document');
+  quill.QuillController? _controller;
   ErrorModel? errorModel;
   SocketRepository socketRepository = SocketRepository();
 
@@ -34,6 +36,21 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
     super.initState();
     socketRepository.joinRoom(widget.id);
     fetchDocumentData();
+
+    socketRepository.changeListener((data) {
+      _controller?.compose(
+        quill.Delta.fromJson(data['delta']),
+        _controller?.selection ?? const TextSelection.collapsed(offset: 0),
+        quill.ChangeSource.REMOTE,
+      );
+    });
+
+    Timer.periodic(const Duration(seconds: 2), (timer) {
+      socketRepository.autoSave(<String, dynamic>{
+        'delta': _controller!.document.toDelta(),
+        'room': widget.id,
+      });
+    });
   }
 
   void fetchDocumentData() async {
@@ -44,8 +61,28 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
 
     if (errorModel!.data != null) {
       titleController.text = (errorModel!.data as DocumentModel).title;
+      _controller = quill.QuillController(
+          document: errorModel!.data.content.isEmpty
+              ? quill.Document()
+              : quill.Document.fromDelta(
+                  quill.Delta.fromJson(errorModel!.data.content),
+                ),
+          selection: const TextSelection.collapsed(
+            offset: 0,
+          ));
+
       setState(() {});
     }
+
+    _controller!.document.changes.listen((event) {
+      if (event.item3 == quill.ChangeSource.LOCAL) {
+        Map<String, dynamic> map = {
+          'delta': event.item2,
+          'room': widget.id,
+        };
+        socketRepository.typing(map);
+      }
+    });
   }
 
   @override
@@ -65,11 +102,8 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
   @override
   Widget build(BuildContext context) {
     if (_controller == null) {
-      return const Scaffold(
-        body: Loader(),
-      );
+      return const Scaffold(body: Loader());
     }
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: KWhiteColor,
@@ -79,11 +113,9 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
             padding: const EdgeInsets.all(10.0),
             child: ElevatedButton.icon(
               onPressed: () {
-                Clipboard.setData(
-                  ClipboardData(
-                    text: 'http://localhost:3000/#/document/${widget.id}',
-                  ),
-                ).then(
+                Clipboard.setData(ClipboardData(
+                        text: 'http://localhost:3000/#/document/${widget.id}'))
+                    .then(
                   (value) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -99,7 +131,7 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
                 Icons.lock,
                 size: 16,
               ),
-              label: const Text("Share"),
+              label: const Text('Share'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: KBlueColor,
               ),
@@ -112,16 +144,14 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
             children: [
               GestureDetector(
                 onTap: () {
-                  Routemaster.of(context).replace("/");
+                  Routemaster.of(context).replace('/');
                 },
                 child: Image.asset(
                   'assets/images/docs-logo.png',
                   height: 40,
                 ),
               ),
-              const SizedBox(
-                width: 10,
-              ),
+              const SizedBox(width: 10),
               SizedBox(
                 width: 180,
                 child: TextField(
@@ -133,11 +163,9 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
                         color: KBlueColor,
                       ),
                     ),
-                    contentPadding: EdgeInsets.only(
-                      left: 10,
-                    ),
+                    contentPadding: EdgeInsets.only(left: 10),
                   ),
-                  onSubmitted: ((value) => updateTitle(ref, value)),
+                  onSubmitted: (value) => updateTitle(ref, value),
                 ),
               ),
             ],
@@ -158,13 +186,9 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
       body: Center(
         child: Column(
           children: [
-            const SizedBox(
-              height: 10,
-            ),
-            quill.QuillToolbar.basic(controller: _controller),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
+            quill.QuillToolbar.basic(controller: _controller!),
+            const SizedBox(height: 10),
             Expanded(
               child: SizedBox(
                 width: 750,
@@ -174,13 +198,13 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(30.0),
                     child: quill.QuillEditor.basic(
-                      controller: _controller,
+                      controller: _controller!,
                       readOnly: false,
                     ),
                   ),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
