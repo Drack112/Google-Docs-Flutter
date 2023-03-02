@@ -32,6 +32,7 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
   @override
   void initState() {
     super.initState();
+    socketRepository.joinRoom(widget.id);
     fetchDocumentData();
   }
 
