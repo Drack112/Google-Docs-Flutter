@@ -11,6 +11,7 @@ import authRouter from "./routes/AuthRoutes";
 import documentRouter from "./routes/DocumentRoutes";
 import AppError from "./errors/AppError";
 import { Socket } from "socket.io";
+import Document from "./schemas/document";
 
 const app = express();
 
@@ -49,7 +50,21 @@ io.on("connection", (socket: Socket) => {
     socket.join(documentId);
     console.log(socket.id, " joined")
   })
+
+  socket.on("typing", (data: any) => {
+    socket.broadcast.to(data.room).emit('changes', data);
+  })
+
+  socket.on("save", (data: any) => {
+    saveData(data);
+  })
 })
+
+const saveData = async (data: any) => {
+  let document = await Document.findById(data.room);
+  document?.content = data.delta;
+  document = await document.save;
+}
 
 server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`)
