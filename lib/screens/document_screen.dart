@@ -1,5 +1,7 @@
 import 'package:docs_google/colors.dart';
 import 'package:docs_google/common/widgets/loader.dart';
+import 'package:docs_google/models/document_model.dart';
+import 'package:docs_google/models/error_model.dart';
 import 'package:docs_google/repository/auth_repository.dart';
 import 'package:docs_google/repository/document_repository.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,25 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
   TextEditingController titleController =
       TextEditingController(text: "Untitled Document");
   final quill.QuillController _controller = quill.QuillController.basic();
+  ErrorModel? errorModel;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDocumentData();
+  }
+
+  void fetchDocumentData() async {
+    errorModel = await ref.read(documentRepositoryProvider).getDocumentById(
+          ref.read(userProvider)!.token,
+          widget.id,
+        );
+
+    if (errorModel!.data != null) {
+      titleController.text = (errorModel!.data as DocumentModel).title;
+      setState(() {});
+    }
+  }
 
   @override
   void dispose() {

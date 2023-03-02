@@ -133,4 +133,39 @@ class DocumentRepository {
       }),
     );
   }
+
+  Future<ErrorModel> getDocumentById(String token, String id) async {
+    ErrorModel error = ErrorModel(
+      error: 'Some unexpected error occurred.',
+      data: null,
+    );
+
+    try {
+      var res = await _client.get(
+        Uri.parse('$host/doc/$id'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer: $token',
+        },
+      );
+
+      switch (res.statusCode) {
+        case 200:
+          error = ErrorModel(
+            error: null,
+            data: DocumentModel.fromJson(res.body),
+          );
+          break;
+        default:
+          throw 'This document does not exist, please create a new one';
+      }
+    } catch (e) {
+      error = ErrorModel(
+        error: e.toString(),
+        data: null,
+      );
+    }
+
+    return error;
+  }
 }
