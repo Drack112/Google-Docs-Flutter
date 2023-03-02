@@ -4,6 +4,7 @@ import 'package:docs_google/models/document_model.dart';
 import 'package:docs_google/models/error_model.dart';
 import 'package:docs_google/repository/auth_repository.dart';
 import 'package:docs_google/repository/document_repository.dart';
+import 'package:docs_google/repository/socket_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
@@ -26,6 +27,7 @@ class _DocumentScreenState extends ConsumerState<DocumentScreen> {
       TextEditingController(text: "Untitled Document");
   final quill.QuillController _controller = quill.QuillController.basic();
   ErrorModel? errorModel;
+  SocketRepository socketRepository = SocketRepository();
 
   @override
   void initState() {
