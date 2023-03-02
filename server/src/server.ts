@@ -45,9 +45,12 @@ app.use(
 const PORT = process.env.APP_PORT;
 
 io.on("connection", (socket: Socket) => {
-  console.log("WebSocket connected: " + socket.id)
+  socket.on("join", (documentId: string) => {
+    socket.join(documentId);
+    console.log(socket.id, " joined")
+  })
 })
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`)
 })
